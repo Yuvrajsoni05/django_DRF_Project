@@ -9,6 +9,13 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
     ListModelMixin,CreateModelMixin,RetrieveModelMixin,UpdateModelMixin,DestroyModelMixin
 )
+from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+from .permissions import IsAdminForDelete
+
+from .pagination import StudentPagination
 # Create your views here.
 
 class StudentAPIView(APIView):
@@ -76,7 +83,7 @@ class StudentDetailView(APIView):
 class StudentListGenericAPIView(GenericAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-
+    
     def get(self,request):
         student = self.get_queryset()
         serializer = self.get_serializer(
@@ -163,6 +170,39 @@ class StudentMixinDetailView(RetrieveModelMixin,UpdateModelMixin,DestroyModelMix
         return Response({
             "message":"Delete Successfully"
         })
+
+# Concrete Generic Views Completed
+
+
+
+class StudentListAPIView(ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    pagination_class = StudentPagination
+
+class StudentDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsAdminForDelete
+    ]
+    # permission_classes = [IsAuthenticated]
+
+
+
+class StudentViewSetAPIView(ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    permission_classes = [IsAuthenticated]
+
+
+
+
+# Model ViewSet Gives
+
+
+
 
 
 
