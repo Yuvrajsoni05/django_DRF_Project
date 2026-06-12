@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Student
+from .models import *
 from django.http import JsonResponse
 from rest_framework.response import Response
-from .serializers import StudentSerializer
+from .serializers import StudentSerializer,DepartmentSerializer,StudentNestedSerializer ,DepartmentNestedSerilizer,StudentProfileSerializer,CourseSerializer,StudentWritableSerializer
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import GenericAPIView
@@ -16,6 +16,8 @@ from rest_framework.permissions import AllowAny
 from .permissions import IsAdminForDelete
 
 from .pagination import StudentPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 # Create your views here.
 
 class StudentAPIView(APIView):
@@ -83,6 +85,11 @@ class StudentDetailView(APIView):
 class StudentListGenericAPIView(GenericAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    filterset_fields = ['student_name', 'student_age']
     
     def get(self,request):
         student = self.get_queryset()
@@ -91,7 +98,7 @@ class StudentListGenericAPIView(GenericAPIView):
             many=True
         )
         return Response(serializer.data)
-        
+
         
     def post(self,request):
         serializer = self.get_serializer(
@@ -108,6 +115,7 @@ class StudentListGenericAPIView(GenericAPIView):
 class StudentListGenericDetailView(GenericAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+   
     def get(self,request,pk):
         student = self.get_object()
         serializer =self.get_serializer(student)
@@ -179,6 +187,7 @@ class StudentListAPIView(ListCreateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
     pagination_class = StudentPagination
+    
 
 class StudentDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Student.objects.all()
@@ -194,36 +203,68 @@ class StudentDetailAPIView(RetrieveUpdateDestroyAPIView):
 class StudentViewSetAPIView(ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+
+
+# django filter filter 
+
+class StudentListGenericFilterAPIView(GenericAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    filterset_fields = ['student_name', 'student_age']
+    def get(self,request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
+
+# Django  SearchFilter
+class StudentListGenericSearchFilterAPIView(GenericAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    filter_backends = [
+        SearchFilter,
+    ]
+    search_fields = ['student_name', 'student_age']
+    def get(self,request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
+
+    
+
+# Department Model ViewSet Gives
+
+class DepartmentViewSet(ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+
+
+# Nested serilizer 
+class StudentNestedSerilizerViewSetAPIView(ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentNestedSerializer
+    
+
+
+class DepartmentNestedSerilizerViewSetAPIView(ModelViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentNestedSerilizer
 
 
 
 
-# Model ViewSet Gives
+class CourseViewSetAPIView(ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class StudentWritableViewSet(ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentWritableSerializer
 
 
 

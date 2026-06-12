@@ -1,7 +1,8 @@
 # from student_management.app.models import Student
 from django.contrib import admin
-from .models import Student
+from .models import Student,StudentProfile
 
 
 # Register your models here.
 admin.site.register(Student)
+admin.site.register(StudentProfile)
