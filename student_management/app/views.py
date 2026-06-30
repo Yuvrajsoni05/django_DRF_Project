@@ -18,13 +18,20 @@ from .permissions import IsAdminForDelete
 from .pagination import StudentPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from .authentication import CustomAuthentication
+
 # Create your views here.
 
 class StudentAPIView(APIView):
-    def get(self,request):
-        student = Student.objects.all()
-        serializer = StudentSerializer(student,many=True)
-        return Response(serializer.data)
+    authentication_classes = [CustomAuthentication]
+    # def get(self,request):
+    #     student = Student.objects.all()
+    #     serializer = StudentSerializer(student,many=True)
+    #     return Response(serializer.data)
+    def get(self, request):
+        return Response({
+            "user": str(request.user)
+        })
 
     def post(self,request):
         serializer = StudentSerializer(data=request.data)
