@@ -6,4 +6,8 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('id', 'brand_name', 'slug', 'description', 'logo', 'created_at', 'updated_at')
     
     search_fields = ('brand_name', 'slug', 'description')
-    prepopulated_fields = {'slug': ('brand_name','id')}
+    prepopulated_fields = {'slug': ('brand_name',)} #why need this 
+    
+    
+admin.site.register(Brand, BrandAdmin)
+
